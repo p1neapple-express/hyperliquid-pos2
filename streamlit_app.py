@@ -11,7 +11,7 @@ addresses = {
     "Main Account-72a9": st.secrets['main_account'],
     "Dust-41d5": st.secrets['dust'],
     "Hold-aff3": st.secrets['hold'],
-    "Valut-ba36": st.secrets['vault']
+    "Vault-ba36": st.secrets['vault']
 }
 
 # fetching and storing spot prices and token mappings
@@ -65,7 +65,7 @@ for id, tab in zip(ids, tabs):
     spot_user_state = info.spot_user_state(address)
     summary = perps_user_state['crossMarginSummary']
     perps_account_value = float(summary['accountValue'])
-    column1, column2 = tab.columns(2)
+    column1, column2, column3 = tab.columns(3)
     perps_total_margin_used = float(summary['totalMarginUsed'])
     perps_total_pos_value = float(summary['totalNtlPos'])
     column1.write(f"**Account Value**: ${perps_account_value:,.2f}")
@@ -90,6 +90,11 @@ for id, tab in zip(ids, tabs):
         column2.write(f"**Total Funding**: ${perps_total_funding:,.2f}")
         column2.write(
             f"**Leverage**: {(perps_total_pos_value/perps_account_value):,.2f}")
+        perps_init_balance = perps_account_value - perps_total_pnl
+        perps_pnl_pct = (
+            (perps_account_value - perps_init_balance) / perps_init_balance) * 100
+        column3.write(f"**Initial Balance**: {perps_init_balance:,.2f}")
+        column3.write(f"**PnL %**: {perps_pnl_pct:,.2f}")
         tab.subheader(f"**Perp Positions**: {len(perps_positions_df):,}")
         tab.dataframe(perps_positions_df,
                       use_container_width=True, hide_index=True)
